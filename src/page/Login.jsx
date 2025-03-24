@@ -8,16 +8,20 @@ export function Login({page, setPage}) {
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
     const [success, setSuccess] = useState();
+    const [loading, setLoading] = useState(false);
 
     async function handleLoginStep1() {
+        setLoading(true);
         let response = await axios.post(API_URL + '/user/send-otp', {
             email
         });
         setSuccess(response.data.message);
         setP(1);
+        setLoading(false);
     }
 
     async function handleLoginStep2() {
+        setLoading(true);
         let response = await axios.post(API_URL + '/user/verify-otp', {
             email,
             otp
@@ -30,6 +34,7 @@ export function Login({page, setPage}) {
         }else{
             setSuccess('Invalid OTP');
         }
+        setLoading(false);
     }
 
     return (
@@ -42,7 +47,7 @@ export function Login({page, setPage}) {
                     <input type='email' placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)}/> :
                     <input type='text' placeholder='Otp' value={otp} onChange={(e) => setOtp(e.target.value)}/>
                 }
-                <button onClick={p == 0 ? handleLoginStep1 : handleLoginStep2}>Login</button>
+                <button onClick={loading || p == 0 ? handleLoginStep1 : handleLoginStep2} disabled={loading}>{loading ? 'Loading...' : 'Login'}</button>
             </div>
         </div>
     )
